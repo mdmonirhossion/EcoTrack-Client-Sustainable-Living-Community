@@ -52,23 +52,23 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <nav className="sticky top-0 z-50 text-white bg-gray-900 shadow-lg">
+      <div className="flex items-center justify-between px-4 py-3 mx-auto max-w-7xl">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <FaLeaf className="text-green-400 text-2xl" />
+          <FaLeaf className="text-2xl text-green-400" />
           <span className="text-xl font-bold text-white">
             Eco<span className="text-green-400">Track</span>
           </span>
         </Link>
 
         {/* Desktop Nav Links */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+        <div className="items-center hidden gap-8 text-sm font-medium md:flex">
           {navLinks}
         </div>
 
         {/* Desktop Auth */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="items-center hidden gap-3 md:flex">
           {user ? (
             <div className="relative">
               <button
@@ -78,25 +78,25 @@ const Navbar = () => {
                 <img
                   src={user.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png"}
                   alt={user.displayName}
-                  className="w-9 h-9 rounded-full border-2 border-green-400 object-cover"
+                  className="object-cover border-2 border-green-400 rounded-full w-9 h-9"
                 />
                 <span className="text-sm font-medium">{user.displayName}</span>
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-xl shadow-xl py-2 z-50">
+                <div className="absolute right-0 z-50 w-48 py-2 mt-2 text-gray-800 bg-white shadow-xl rounded-xl">
                   <p className="px-4 py-2 text-xs text-gray-500 border-b">
                     {user.email}
                   </p>
                   <Link
                     to="/my-activities"
-                    className="block px-4 py-2 hover:bg-green-50 text-sm"
+                    className="block px-4 py-2 text-sm hover:bg-green-50"
                     onClick={() => setDropdownOpen(false)}
                   >
                     My Activities
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-sm text-red-500"
+                    className="w-full px-4 py-2 text-sm text-left text-red-500 hover:bg-red-50"
                   >
                     Logout
                   </button>
@@ -107,13 +107,13 @@ const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className="px-4 py-2 text-sm font-medium border border-green-400 text-green-400 rounded-lg hover:bg-green-400 hover:text-gray-900 transition"
+                className="px-4 py-2 text-sm font-medium text-green-400 transition border border-green-400 rounded-lg hover:bg-green-400 hover:text-gray-900"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="px-4 py-2 text-sm font-medium bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                className="px-4 py-2 text-sm font-medium text-white transition bg-green-500 rounded-lg hover:bg-green-600"
               >
                 Register
               </Link>
@@ -123,7 +123,7 @@ const Navbar = () => {
 
         {/* Mobile Hamburger */}
         <button
-          className="md:hidden text-xl focus:outline-none"
+          className="text-xl md:hidden focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <FaTimes /> : <FaBars />}
@@ -132,15 +132,15 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-gray-800 px-6 py-4 flex flex-col gap-4 text-sm font-medium">
+        <div className="flex flex-col gap-4 px-6 py-4 text-sm font-medium bg-gray-800 md:hidden">
           {navLinks}
           {user ? (
             <>
-              <div className="flex items-center gap-2 border-t border-gray-700 pt-3">
+              <div className="flex items-center gap-2 pt-3 border-t border-gray-700">
                 <img
                   src={user.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png"}
                   alt={user.displayName}
-                  className="w-8 h-8 rounded-full border border-green-400"
+                  className="w-8 h-8 border border-green-400 rounded-full"
                 />
                 <span>{user.displayName}</span>
               </div>
@@ -152,17 +152,17 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <div className="flex gap-3 border-t border-gray-700 pt-3">
+            <div className="flex gap-3 pt-3 border-t border-gray-700">
               <Link
                 to="/login"
-                className="flex-1 text-center py-2 border border-green-400 text-green-400 rounded-lg"
+                className="flex-1 py-2 text-center text-green-400 border border-green-400 rounded-lg"
                 onClick={() => setMenuOpen(false)}
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="flex-1 text-center py-2 bg-green-500 text-white rounded-lg"
+                className="flex-1 py-2 text-center text-white bg-green-500 rounded-lg"
                 onClick={() => setMenuOpen(false)}
               >
                 Register
