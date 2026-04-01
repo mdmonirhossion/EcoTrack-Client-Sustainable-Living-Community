@@ -23,6 +23,21 @@ const Challenges = () => {
   const [minP, setMinP] = useState("");
   const [maxP, setMaxP] = useState("");
 
+  useEffect(() => {
+    const params = {};
+    if (selectedCategory !== "All") params.category = selectedCategory;
+    if (minP) params.minP = minP;
+    if (maxP) params.maxP = maxP;
+
+    axios
+      .get(`${API}/api/challenges`, { params })
+      .then((res) => {
+        setChallenges(res.data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [selectedCategory, minP, maxP]);
+
   const fetchChallenges = () => {
     setLoading(true);
     const params = {};
@@ -38,10 +53,6 @@ const Challenges = () => {
       })
       .catch(() => setLoading(false));
   };
-
-  useEffect(() => {
-    fetchChallenges();
-  }, [selectedCategory]);
 
   const filtered = challenges.filter((c) =>
     c.title.toLowerCase().includes(search.toLowerCase())

@@ -15,7 +15,7 @@ const Register = () => {
     if (pass.length < 6) return "Minimum 6 characters required.";
     if (!/[A-Z]/.test(pass)) return "Must include at least 1 uppercase letter.";
     if (!/[a-z]/.test(pass)) return "Must include at least 1 lowercase letter.";
-    if (!/[!@#$%^&*(),.?"{}|<>]/.test(pass))
+    if (!/[!@#$%^&*(),.?":|<>{}]/.test(pass))
       return "Must include at least 1 special character.";
     return "";
   };
@@ -50,7 +50,7 @@ const Register = () => {
       await googleLogin();
       toast.success("Welcome to EcoTrack! 🌿");
       navigate("/");
-    } catch {
+    } catch (err) {
       toast.error("Google signup failed!");
     } finally {
       setLoading(false);
