@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ChallengeCard from "../components/ChallengeCard";
 import SkeletonCard from "../components/SkeletonCard";
-import { FaFilter, FaSearch } from "react-icons/fa";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { FaFilter, FaSearch, FaTimes } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -15,43 +17,69 @@ const categories = [
   "Green Living",
 ];
 
-const Challenges = () => {
+const ChallengesContent = () => {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [minP, setMinP] = useState("");
   const [maxP, setMaxP] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [applying, setApplying] = useState(false);
 
+  // Initial fetch
   useEffect(() => {
-    const params = {};
-    if (selectedCategory !== "All") params.category = selectedCategory;
-    if (minP) params.minP = minP;
-    if (maxP) params.maxP = maxP;
+    fetchChallenges();
+  }, []);
 
-    axios
-      .get(`${API}/api/challenges`, { params })
-      .then((res) => {
-        setChallenges(res.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [selectedCategory, minP, maxP]);
-
-  const fetchChallenges = () => {
+  const fetchChallenges = async (params = {}) => {
     setLoading(true);
-    const params = {};
-    if (selectedCategory !== "All") params.category = selectedCategory;
-    if (minP) params.minP = minP;
-    if (maxP) params.maxP = maxP;
+    try {
+      const res = await axios.get(`${API}/api/challenges`, { params });
+      setChallenges(res.data);
+    } catch (err) {
+      toast.error("Failed to load challenges. Please try again!");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    axios
-      .get(`${API}/api/challenges`, { params })
-      .then((res) => {
-        setChallenges(res.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+  const handleApplyFilters = async () => {
+    setApplying(true);
+    try {
+      const params = {};
+      if (selectedCategory !== "All") params.category = selectedCategory;
+      if (minP) params.minP = minP;
+      if (maxP) params.maxP = maxP;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      const res = await axios.get(`${API}/api/challenges`, { params });
+      setChallenges(res.data);
+
+      if (res.data.length === 0) {
+        toast("No challenges match your filters 🌿", { icon: "🔍" });
+      } else {
+        toast.success(`Found ${res.data.length} challenges!`);
+      }
+    } catch (err) {
+      toast.error("Filter failed. Please try again!");
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const handleReset = () => {
+    setSelectedCategory("All");
+    setMinP("");
+    setMaxP("");
+    setStartDate("");
+    setEndDate("");
+    setSearch("");
+    fetchChallenges();
+    toast.success("Filters cleared!");
   };
 
   const filtered = challenges.filter((c) =>
@@ -60,61 +88,138 @@ const Challenges = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Page Header */}
-      <div className="bg-emerald-900 text-white py-14 px-6 text-center">
-        <h1 className="text-4xl font-black mb-2">Browse Challenges</h1>
-        <p className="text-emerald-300 text-sm max-w-xl mx-auto">
-          Find the perfect sustainability challenge and start making a difference today.
+      {/* Header */}
+      <header className="px-6 text-center text-white bg-emerald-900 py-14">
+        <h1 className="mb-2 text-4xl font-black">Sustainable Challenges</h1>
+        <p className="max-w-xl mx-auto text-sm text-emerald-300">
+          Find the perfect sustainability challenge and start making a
+          difference today.
         </p>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        {/* Filters */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <FaFilter className="text-green-500" />
-            <span className="font-semibold text-gray-700">Filter Challenges</span>
+      <main className="px-6 py-10 mx-auto max-w-7xl">
+        {/* Filter Box */}
+        <section
+          aria-label="Filter challenges"
+          className="p-6 mb-8 bg-white border border-gray-100 shadow-sm rounded-2xl"
+        >
+          <div className="flex items-center gap-2 mb-5">
+            <FaFilter className="text-green-500" aria-hidden="true" />
+            <h2 className="text-lg font-bold text-gray-700">
+              Filter Challenges
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 lg:grid-cols-4">
             {/* Search */}
-            <div className="relative md:col-span-2">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+            <div className="relative lg:col-span-2">
+              <label htmlFor="search" className="sr-only">
+                Search challenges
+              </label>
+              <FaSearch
+                className="absolute text-sm text-gray-400 -translate-y-1/2 left-3 top-1/2"
+                aria-hidden="true"
+              />
               <input
+                id="search"
                 type="text"
                 placeholder="Search challenges..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="w-full py-3 pr-4 text-sm border border-gray-200 pl-9 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                aria-label="Search challenges by title"
               />
             </div>
 
             {/* Min Participants */}
-            <input
-              type="number"
-              placeholder="Min participants"
-              value={minP}
-              onChange={(e) => setMinP(e.target.value)}
-              className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-            />
+            <div>
+              <label
+                htmlFor="minP"
+                className="block mb-1 text-xs font-medium text-gray-500"
+              >
+                Min Participants
+              </label>
+              <input
+                id="minP"
+                type="number"
+                placeholder="e.g. 10"
+                value={minP}
+                min={0}
+                onChange={(e) => setMinP(e.target.value)}
+                className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                aria-label="Minimum participants"
+              />
+            </div>
 
             {/* Max Participants */}
-            <input
-              type="number"
-              placeholder="Max participants"
-              value={maxP}
-              onChange={(e) => setMaxP(e.target.value)}
-              className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-            />
+            <div>
+              <label
+                htmlFor="maxP"
+                className="block mb-1 text-xs font-medium text-gray-500"
+              >
+                Max Participants
+              </label>
+              <input
+                id="maxP"
+                type="number"
+                placeholder="e.g. 1000"
+                value={maxP}
+                min={0}
+                onChange={(e) => setMaxP(e.target.value)}
+                className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                aria-label="Maximum participants"
+              />
+            </div>
+
+            {/* Start Date */}
+            <div>
+              <label
+                htmlFor="startDate"
+                className="block mb-1 text-xs font-medium text-gray-500"
+              >
+                Start Date (from)
+              </label>
+              <input
+                id="startDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                aria-label="Filter from start date"
+              />
+            </div>
+
+            {/* End Date */}
+            <div>
+              <label
+                htmlFor="endDate"
+                className="block mb-1 text-xs font-medium text-gray-500"
+              >
+                End Date (to)
+              </label>
+              <input
+                id="endDate"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                aria-label="Filter to end date"
+              />
+            </div>
           </div>
 
-          {/* Category pills */}
-          <div className="flex flex-wrap gap-2 mt-4">
+          {/* Category Pills
+          <div
+            className="flex flex-wrap gap-2 mb-5"
+            role="group"
+            aria-label="Filter by category"
+          >
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+                aria-pressed={selectedCategory === cat}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-green-400 ${
                   selectedCategory === cat
                     ? "bg-green-500 text-white"
                     : "bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700"
@@ -123,53 +228,116 @@ const Challenges = () => {
                 {cat}
               </button>
             ))}
-          </div>
+          </div> */}
+          {/* Category Dropdown */}
+<div className="mb-5">
+  <label
+    htmlFor="category"
+    className="block mb-1 text-xs font-medium text-gray-500"
+  >
+    Category
+  </label>
+  <select
+    id="category"
+    value={selectedCategory}
+    onChange={(e) => setSelectedCategory(e.target.value)}
+    className="w-full px-4 py-3 text-sm text-gray-700 bg-white border border-green-400 cursor-pointer md:w-72 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+    aria-label="Filter by category"
+  >
+    {categories.map((cat) => (
+      <option key={cat} value={cat}>
+        {cat}
+      </option>
+    ))}
+  </select>
+</div>
 
-          <div className="mt-4 flex gap-3">
+          {/* Action Buttons */}
+          <div className="flex gap-3">
             <button
-              onClick={fetchChallenges}
-              className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition"
+              onClick={handleApplyFilters}
+              disabled={applying}
+              className="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-60"
+              aria-label="Apply filters"
             >
-              Apply Filters
+              {applying ? (
+                <span
+                  className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"
+                  aria-hidden="true"
+                ></span>
+              ) : (
+                <FaFilter aria-hidden="true" />
+              )}
+              {applying ? "Applying..." : "Apply Filters"}
             </button>
             <button
-              onClick={() => {
-                setSelectedCategory("All");
-                setMinP("");
-                setMaxP("");
-                setSearch("");
-              }}
-              className="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-semibold rounded-xl transition"
+              onClick={handleReset}
+              className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-semibold rounded-xl transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              aria-label="Reset all filters"
             >
-              Reset
+              <FaTimes aria-hidden="true" /> Reset
             </button>
           </div>
-        </div>
+        </section>
 
-        {/* Results count */}
+        {/* Results Count */}
         {!loading && (
-          <p className="text-sm text-gray-500 mb-6">
-            Showing <span className="font-semibold text-green-600">{filtered.length}</span> challenges
+          <p className="mb-6 text-sm text-gray-500" aria-live="polite">
+            Showing{" "}
+            <span className="font-bold text-green-600">
+              {filtered.length}
+            </span>{" "}
+            challenges
+            {selectedCategory !== "All" && (
+              <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                {selectedCategory}
+              </span>
+            )}
           </p>
         )}
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading
-            ? Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)
-            : filtered.length > 0
-            ? filtered.map((c) => <ChallengeCard key={c._id} challenge={c} />)
-            : (
-              <div className="col-span-3 text-center py-20 text-gray-400">
-                <p className="text-5xl mb-4">🌿</p>
-                <p className="text-lg font-semibold">No challenges found</p>
-                <p className="text-sm">Try adjusting your filters</p>
+        {/* Challenge Grid */}
+        <section aria-label="Challenge list">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {loading ? (
+              Array(6)
+                .fill(0)
+                .map((_, i) => <SkeletonCard key={i} />)
+            ) : filtered.length > 0 ? (
+              filtered.map((c) => (
+                <ChallengeCard key={c._id} challenge={c} />
+              ))
+            ) : (
+              <div className="col-span-3 py-20 text-center">
+                <div className="mb-4 text-6xl" aria-hidden="true">
+                  🌿
+                </div>
+                <h3 className="mb-2 text-xl font-bold text-gray-600">
+                  No challenges found
+                </h3>
+                <p className="mb-4 text-sm text-gray-400">
+                  Try adjusting your filters or search query
+                </p>
+                <button
+                  onClick={handleReset}
+                  className="px-6 py-2 text-sm font-semibold text-white transition bg-green-500 rounded-xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+                >
+                  Clear Filters
+                </button>
               </div>
             )}
-        </div>
-      </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 };
+
+// Wrap with ErrorBoundary
+const Challenges = () => (
+  <ErrorBoundary>
+    <ChallengesContent />
+  </ErrorBoundary>
+);
 
 export default Challenges;

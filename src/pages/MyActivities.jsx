@@ -83,17 +83,17 @@ const MyActivities = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-emerald-900 text-white py-14 px-6">
+      <div className="px-6 text-white bg-emerald-900 py-14">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-4 mb-4">
             <img
               src={user?.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png"}
               alt={user?.displayName}
-              className="w-16 h-16 rounded-full border-4 border-green-400 object-cover"
+              className="object-cover w-16 h-16 border-4 border-green-400 rounded-full"
             />
             <div>
               <h1 className="text-3xl font-black">My Activities</h1>
-              <p className="text-emerald-300 text-sm">{user?.email}</p>
+              <p className="text-sm text-emerald-300">{user?.email}</p>
             </div>
           </div>
 
@@ -104,31 +104,31 @@ const MyActivities = () => {
               { icon: <FaFire />, value: ongoingCount, label: "Ongoing" },
               { icon: <FaTrophy />, value: completedCount, label: "Completed" },
             ].map((s, i) => (
-              <div key={i} className="bg-white/10 rounded-xl p-4 text-center">
-                <div className="text-green-300 flex justify-center mb-1">{s.icon}</div>
+              <div key={i} className="p-4 text-center bg-white/10 rounded-xl">
+                <div className="flex justify-center mb-1 text-green-300">{s.icon}</div>
                 <div className="text-2xl font-black">{s.value}</div>
-                <div className="text-emerald-300 text-xs">{s.label}</div>
+                <div className="text-xs text-emerald-300">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <div className="max-w-5xl px-6 py-10 mx-auto">
         {activities.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-6xl mb-4">🌱</p>
-            <h2 className="text-xl font-bold text-gray-700 mb-2">
+          <div className="py-20 text-center">
+            <p className="mb-4 text-6xl">🌱</p>
+            <h2 className="mb-2 text-xl font-bold text-gray-700">
               No activities yet!
             </h2>
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="mb-6 text-sm text-gray-500">
               Join a challenge to start tracking your eco-impact.
             </p>
             <Link
               to="/challenges"
-              className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition"
+              className="px-6 py-3 font-semibold text-white transition bg-green-500 hover:bg-green-600 rounded-xl"
             >
-              Browse Challenges
+              
             </Link>
           </div>
         ) : (
@@ -138,7 +138,7 @@ const MyActivities = () => {
               return (
                 <div
                   key={activity._id}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                  className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl"
                 >
                   <div className="flex flex-col md:flex-row">
                     {/* Challenge image */}
@@ -146,14 +146,14 @@ const MyActivities = () => {
                       <img
                         src={challenge.imageUrl}
                         alt={challenge?.title}
-                        className="w-full md:w-48 h-40 md:h-auto object-cover flex-shrink-0"
+                        className="flex-shrink-0 object-cover w-full h-40 md:w-48 md:h-auto"
                       />
                     )}
 
-                    <div className="p-6 flex-grow">
+                    <div className="flex-grow p-6">
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div>
-                          <h3 className="font-bold text-gray-800 text-lg">
+                          <h3 className="text-lg font-bold text-gray-800">
                             {challenge?.title || "Challenge"}
                           </h3>
                           <p className="text-xs text-gray-400 mt-0.5">
@@ -173,7 +173,7 @@ const MyActivities = () => {
 
                       {/* Progress bar */}
                       <div className="mb-4">
-                        <div className="flex justify-between text-xs text-gray-500 mb-1">
+                        <div className="flex justify-between mb-1 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
                             <FaChartLine className="text-green-500" /> Progress
                           </span>
@@ -181,16 +181,16 @@ const MyActivities = () => {
                             {activity.progress}%
                           </span>
                         </div>
-                        <div className="w-full bg-gray-100 rounded-full h-3">
+                        <div className="w-full h-3 bg-gray-100 rounded-full">
                           <div
-                            className="bg-gradient-to-r from-green-400 to-emerald-500 h-3 rounded-full transition-all duration-500"
+                            className="h-3 transition-all duration-500 rounded-full bg-gradient-to-r from-green-400 to-emerald-500"
                             style={{ width: `${activity.progress}%` }}
                           ></div>
                         </div>
                       </div>
 
                       {/* Update controls */}
-                      <div className="flex flex-wrap gap-3 items-center">
+                      <div className="flex flex-wrap items-center gap-3">
                         <input
                           type="range"
                           min={0}
@@ -205,7 +205,7 @@ const MyActivities = () => {
                               )
                             );
                           }}
-                          className="flex-grow accent-green-500 h-2"
+                          className="flex-grow h-2 accent-green-500"
                         />
 
                         <select
@@ -219,7 +219,7 @@ const MyActivities = () => {
                               )
                             );
                           }}
-                          className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
+                          className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
                         >
                           <option>Not Started</option>
                           <option>Ongoing</option>
@@ -231,10 +231,10 @@ const MyActivities = () => {
                             updateProgress(activity._id, activity.progress, activity.status)
                           }
                           disabled={updating === activity._id}
-                          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition disabled:opacity-60 flex items-center gap-2"
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition bg-green-500 hover:bg-green-600 rounded-xl disabled:opacity-60"
                         >
                           {updating === activity._id ? (
-                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            <span className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"></span>
                           ) : (
                             "Save"
                           )}

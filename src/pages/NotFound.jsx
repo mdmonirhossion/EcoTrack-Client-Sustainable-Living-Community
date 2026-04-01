@@ -46,7 +46,7 @@ const NotFound = () => {
             to="/challenges"
             className="px-6 py-3 font-semibold text-green-600 transition border border-green-500 rounded-xl hover:bg-green-50"
           >
-            Browse Challenges
+            
           </Link>
         </div>
 

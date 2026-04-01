@@ -62,7 +62,7 @@ const Home = () => {
       <section className="relative min-h-[520px] flex items-center overflow-hidden">
         {/* Background */}
         <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-700"
+          className="absolute inset-0 transition-all duration-700 bg-center bg-cover"
           style={{
             backgroundImage: heroChallenge?.imageUrl
               ? `url(${heroChallenge.imageUrl})`
@@ -73,41 +73,41 @@ const Home = () => {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 text-white">
-          <span className="inline-block bg-green-500/20 border border-green-400 text-green-300 text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
+        <div className="relative z-10 px-6 py-20 mx-auto text-white max-w-7xl">
+          <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-green-300 uppercase border border-green-400 rounded-full bg-green-500/20">
             🌿 Featured Challenge
           </span>
-          <h1 className="text-4xl md:text-6xl font-black mb-4 leading-tight max-w-2xl">
+          <h1 className="max-w-2xl mb-4 text-4xl font-black leading-tight md:text-6xl">
             {heroChallenge?.title || "Join the Green Revolution"}
           </h1>
-          <p className="text-gray-300 text-lg mb-2 max-w-xl">
+          <p className="max-w-xl mb-2 text-lg text-gray-300">
             {heroChallenge?.description ||
               "Discover sustainability challenges, share tips, and track your environmental impact."}
           </p>
           {heroChallenge && (
-            <p className="text-green-400 text-sm mb-6 font-medium">
+            <p className="mb-6 text-sm font-medium text-green-400">
               📊 {heroChallenge.participants} participants • {heroChallenge.category}
             </p>
           )}
-          <div className="flex gap-4 flex-wrap">
+          <div className="flex flex-wrap gap-4">
             {heroChallenge ? (
               <Link
                 to={`/challenges/${heroChallenge._id}`}
-                className="px-6 py-3 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-xl transition flex items-center gap-2"
+                className="flex items-center gap-2 px-6 py-3 font-semibold text-white transition bg-green-500 hover:bg-green-400 rounded-xl"
               >
                 View Challenge <FaArrowRight />
               </Link>
             ) : (
               <Link
                 to="/challenges"
-                className="px-6 py-3 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-xl transition flex items-center gap-2"
+                className="flex items-center gap-2 px-6 py-3 font-semibold text-white transition bg-green-500 hover:bg-green-400 rounded-xl"
               >
-                Browse Challenges <FaArrowRight />
+                 <FaArrowRight />
               </Link>
             )}
             <Link
               to="/register"
-              className="px-6 py-3 border border-white/40 hover:bg-white/10 text-white font-semibold rounded-xl transition"
+              className="px-6 py-3 font-semibold text-white transition border border-white/40 hover:bg-white/10 rounded-xl"
             >
               Join Community
             </Link>
@@ -116,7 +116,7 @@ const Home = () => {
 
         {/* Carousel dots */}
         {challenges.length > 1 && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          <div className="absolute z-10 flex gap-2 -translate-x-1/2 bottom-6 left-1/2">
             {challenges.slice(0, 3).map((_, i) => (
               <button
                 key={i}
@@ -131,8 +131,8 @@ const Home = () => {
       </section>
 
       {/* ── LIVE STATS ── */}
-      <section className="bg-green-600 text-white py-10">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <section className="py-10 text-white bg-green-600">
+        <div className="grid grid-cols-2 gap-6 px-6 mx-auto text-center max-w-7xl md:grid-cols-4">
           {[
             { icon: <FaLeaf />, value: stats.totalChallenges + "+", label: "Active Challenges" },
             { icon: <FaUsers />, value: stats.totalParticipants + "+", label: "Participants" },
@@ -142,32 +142,32 @@ const Home = () => {
             <div key={i} className="flex flex-col items-center gap-2">
               <div className="text-3xl text-green-200">{s.icon}</div>
               <div className="text-3xl font-black">{s.value}</div>
-              <div className="text-green-100 text-sm">{s.label}</div>
+              <div className="text-sm text-green-100">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── ACTIVE CHALLENGES ── */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        <div className="flex justify-between items-end mb-8">
+      <section className="px-6 py-16 mx-auto max-w-7xl">
+        <div className="flex items-end justify-between mb-8">
           <div>
-            <span className="text-green-600 text-sm font-semibold uppercase tracking-wider">
+            <span className="text-sm font-semibold tracking-wider text-green-600 uppercase">
               Take Action
             </span>
-            <h2 className="text-3xl font-black text-gray-800 mt-1">
+            <h2 className="mt-1 text-3xl font-black text-gray-800">
               Active Challenges
             </h2>
           </div>
           <Link
             to="/challenges"
-            className="text-green-600 hover:text-green-700 font-semibold text-sm flex items-center gap-1"
+            className="flex items-center gap-1 text-sm font-semibold text-green-600 hover:text-green-700"
           >
             View All <FaArrowRight />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {loadingChallenges
             ? Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)
             : challenges.map((c) => <ChallengeCard key={c._id} challenge={c} />)}
@@ -175,19 +175,19 @@ const Home = () => {
       </section>
 
       {/* ── WHY GO GREEN ── */}
-      <section className="bg-emerald-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <span className="text-green-400 text-sm font-semibold uppercase tracking-wider">
+      <section className="py-16 text-white bg-emerald-900">
+        <div className="px-6 mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <span className="text-sm font-semibold tracking-wider text-green-400 uppercase">
               Our Mission
             </span>
-            <h2 className="text-3xl font-black mt-1">Why Go Green?</h2>
-            <p className="text-emerald-300 mt-2 max-w-xl mx-auto text-sm">
+            <h2 className="mt-1 text-3xl font-black">Why Go Green?</h2>
+            <p className="max-w-xl mx-auto mt-2 text-sm text-emerald-300">
               Small everyday actions create massive collective change. Here&apos;s why it matters.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 icon: <FaLeaf className="text-3xl text-green-400" />,
@@ -212,11 +212,11 @@ const Home = () => {
             ].map((item, i) => (
               <div
                 key={i}
-                className="bg-emerald-800/60 rounded-2xl p-6 hover:bg-emerald-700/60 transition"
+                className="p-6 transition bg-emerald-800/60 rounded-2xl hover:bg-emerald-700/60"
               >
                 <div className="mb-3">{item.icon}</div>
-                <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-                <p className="text-emerald-300 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="mb-2 text-lg font-bold">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-emerald-300">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -224,15 +224,15 @@ const Home = () => {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <span className="text-green-600 text-sm font-semibold uppercase tracking-wider">
+      <section className="px-6 py-16 mx-auto max-w-7xl">
+        <div className="mb-12 text-center">
+          <span className="text-sm font-semibold tracking-wider text-green-600 uppercase">
             Simple Steps
           </span>
-          <h2 className="text-3xl font-black text-gray-800 mt-1">How It Works</h2>
+          <h2 className="mt-1 text-3xl font-black text-gray-800">How It Works</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {[
             {
               step: "01",
@@ -255,30 +255,30 @@ const Home = () => {
           ].map((item, i) => (
             <div
               key={i}
-              className="text-center bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition border border-gray-100"
+              className="p-8 text-center transition bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md"
             >
-              <div className="text-5xl font-black text-gray-100 mb-2">{item.step}</div>
+              <div className="mb-2 text-5xl font-black text-gray-100">{item.step}</div>
               <div className="flex justify-center mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{item.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+              <h3 className="mb-2 text-xl font-bold text-gray-800">{item.title}</h3>
+              <p className="text-sm leading-relaxed text-gray-500">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── RECENT TIPS ── */}
-      <section className="bg-gray-100 py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex justify-between items-end mb-8">
+      <section className="py-16 bg-gray-100">
+        <div className="px-6 mx-auto max-w-7xl">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <span className="text-green-600 text-sm font-semibold uppercase tracking-wider">
+              <span className="text-sm font-semibold tracking-wider text-green-600 uppercase">
                 Community Wisdom
               </span>
-              <h2 className="text-3xl font-black text-gray-800 mt-1">Recent Tips</h2>
+              <h2 className="mt-1 text-3xl font-black text-gray-800">Recent Tips</h2>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {loadingTips
               ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />)
               : tips.slice(0, 5).map((tip, i) => <TipCard key={i} tip={tip} />)}
@@ -287,17 +287,17 @@ const Home = () => {
       </section>
 
       {/* ── UPCOMING EVENTS ── */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        <div className="flex justify-between items-end mb-8">
+      <section className="px-6 py-16 mx-auto max-w-7xl">
+        <div className="flex items-end justify-between mb-8">
           <div>
-            <span className="text-green-600 text-sm font-semibold uppercase tracking-wider">
+            <span className="text-sm font-semibold tracking-wider text-green-600 uppercase">
               Get Involved
             </span>
-            <h2 className="text-3xl font-black text-gray-800 mt-1">Upcoming Events</h2>
+            <h2 className="mt-1 text-3xl font-black text-gray-800">Upcoming Events</h2>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {loadingEvents
             ? Array(4).fill(0).map((_, i) => <SkeletonCard key={i} />)
             : events.map((event, i) => <EventCard key={i} event={event} />)}
@@ -305,27 +305,27 @@ const Home = () => {
       </section>
 
       {/* ── CTA BANNER ── */}
-      <section className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16 text-center">
-        <div className="max-w-2xl mx-auto px-6">
-          <FaLeaf className="text-5xl mx-auto mb-4 text-green-200" />
-          <h2 className="text-3xl font-black mb-3">
+      <section className="py-16 text-center text-white bg-gradient-to-r from-green-600 to-emerald-700">
+        <div className="max-w-2xl px-6 mx-auto">
+          <FaLeaf className="mx-auto mb-4 text-5xl text-green-200" />
+          <h2 className="mb-3 text-3xl font-black">
             Ready to Make a Difference?
           </h2>
-          <p className="text-green-100 mb-8 text-sm">
+          <p className="mb-8 text-sm text-green-100">
             Join thousands of eco-warriors making measurable impact every single day.
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link
               to="/register"
-              className="px-8 py-3 bg-white text-green-700 font-bold rounded-xl hover:bg-green-50 transition"
+              className="px-8 py-3 font-bold text-green-700 transition bg-white rounded-xl hover:bg-green-50"
             >
               Join for Free
             </Link>
             <Link
               to="/challenges"
-              className="px-8 py-3 border border-white/50 text-white font-bold rounded-xl hover:bg-white/10 transition"
+              className="px-8 py-3 font-bold text-white transition border border-white/50 rounded-xl hover:bg-white/10"
             >
-              Browse Challenges
+              Sustainable Challenges
             </Link>
           </div>
         </div>
