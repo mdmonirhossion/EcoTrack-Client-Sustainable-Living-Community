@@ -10,7 +10,7 @@ import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
 import NotFound from "../pages/NotFound";
 import PrivateRoute from "./PrivateRoute";
-
+import JoinChallenge from "../pages/JoinChallenge";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,6 +34,10 @@ const router = createBrowserRouter([
     ],
   },
   { path: "*", element: <NotFound /> },
+  {
+  path: "/challenges/join/:id",
+  element: <PrivateRoute><JoinChallenge /></PrivateRoute>,
+},
 ]);
 
 export default router;
