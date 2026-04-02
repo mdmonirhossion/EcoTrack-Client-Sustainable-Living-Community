@@ -58,53 +58,53 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center px-4 py-10">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-        <div className="text-center mb-8">
+    <div className="flex items-center justify-center min-h-screen px-4 py-10 bg-gradient-to-br from-green-50 to-emerald-100">
+      <div className="w-full max-w-md p-8 bg-white shadow-xl rounded-2xl">
+        <div className="mb-8 text-center">
           <div className="flex justify-center mb-2">
-            <FaLeaf className="text-green-500 text-4xl" />
+            <FaLeaf className="text-4xl text-green-500" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800">Join EcoTrack</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="mt-1 text-sm text-gray-500">
             Start your green journey today 🌱
           </p>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Full Name</label>
             <input
               type="text"
               name="name"
               required
               placeholder="John Green"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Email Address</label>
             <input
               type="email"
               name="email"
               required
               placeholder="you@example.com"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Photo URL</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Photo URL</label>
             <input
               type="url"
               name="photoURL"
               placeholder="https://example.com/photo.jpg"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
             <div className="relative">
               <input
                 type={showPass ? "text" : "password"}
@@ -121,16 +121,16 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute text-gray-400 -translate-y-1/2 right-3 top-1/2 hover:text-gray-600"
               >
                 {showPass ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
             {passError && (
-              <p className="text-red-500 text-xs mt-1">{passError}</p>
+              <p className="mt-1 text-xs text-red-500">{passError}</p>
             )}
             {!passError && (
-              <p className="text-gray-400 text-xs mt-1">
+              <p className="mt-1 text-xs text-gray-400">
                 Min 6 chars, 1 uppercase, 1 lowercase, 1 special character
               </p>
             )}
@@ -139,10 +139,10 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading || !!passError}
-            className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition disabled:opacity-60 flex items-center justify-center"
+            className="flex items-center justify-center w-full py-3 font-semibold text-white transition bg-green-500 hover:bg-green-600 rounded-xl disabled:opacity-60"
           >
             {loading ? (
-              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span className="w-5 h-5 border-2 border-white rounded-full border-t-transparent animate-spin"></span>
             ) : (
               "Create Account"
             )}
@@ -158,15 +158,15 @@ const Register = () => {
         <button
           onClick={handleGoogle}
           disabled={loading}
-          className="w-full py-3 border border-gray-200 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition text-sm font-medium text-gray-700 disabled:opacity-60"
+          className="flex items-center justify-center w-full gap-3 py-3 text-sm font-medium text-gray-700 transition border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-60"
         >
           <FaGoogle className="text-red-500" />
           Continue with Google
         </button>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="mt-6 text-sm text-center text-gray-500">
           Already have an account?{" "}
-          <Link to="/login" className="text-green-500 font-semibold hover:underline">
+          <Link to="/login" className="font-semibold text-green-500 hover:underline">
             Login here
           </Link>
         </p>

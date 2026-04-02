@@ -3,12 +3,11 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
-  FaLeaf, FaFire, FaCheckCircle,
-  FaClock, FaTrophy, FaChartLine
+  FaLeaf, FaFire, FaCheckCircle, FaClock,
+  FaTrophy, FaChartLine, FaCalendarAlt
 } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
 import Spinner from "../components/Spinner";
-import SkeletonCard from "../components/SkeletonCard";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -37,15 +36,14 @@ const MyActivities = () => {
       .get(`${API}/api/my-activities/${user.email}`)
       .then(async (res) => {
         setActivities(res.data);
-        // Fetch challenge details for each activity
         const challengeDetails = {};
         await Promise.all(
           res.data.map(async (act) => {
             try {
               const r = await axios.get(`${API}/api/challenges/${act.challengeId}`);
               challengeDetails[act.challengeId] = r.data;
-            } catch (err) {
-              // Silently handle challenge fetch errors
+            } catch (error) {
+              // Silently ignore errors if challenge details fail to load
             }
           })
         );
@@ -55,19 +53,38 @@ const MyActivities = () => {
       .catch(() => setLoading(false));
   }, [user]);
 
-  const updateProgress = async (activityId, progress, status) => {
+  const handleProgressChange = (activityId, value) => {
+    setActivities((prev) =>
+      prev.map((a) =>
+        a._id === activityId ? { ...a, progress: parseInt(value) } : a
+      )
+    );
+  };
+
+  const handleStatusChange = (activityId, value) => {
+    setActivities((prev) =>
+      prev.map((a) =>
+        a._id === activityId ? { ...a, status: value } : a
+      )
+    );
+  };
+
+  const updateProgress = async (activityId) => {
+    const activity = activities.find((a) => a._id === activityId);
     setUpdating(activityId);
     try {
       await axios.patch(`${API}/api/my-activities/${activityId}/progress`, {
-        progress: parseInt(progress),
-        status,
+        progress: activity.progress,
+        status: activity.status,
       });
       setActivities((prev) =>
         prev.map((a) =>
-          a._id === activityId ? { ...a, progress: parseInt(progress), status } : a
+          a._id === activityId
+            ? { ...a, updatedAt: new Date().toISOString() }
+            : a
         )
       );
-      toast.success("Progress updated! 🌿");
+      toast.success("Progress updated successfully! 🌿");
     } catch {
       toast.error("Failed to update progress!");
     } finally {
@@ -77,18 +94,25 @@ const MyActivities = () => {
 
   const completedCount = activities.filter((a) => a.status === "Finished").length;
   const ongoingCount = activities.filter((a) => a.status === "Ongoing").length;
+  const totalProgress =
+    activities.length > 0
+      ? Math.round(
+          activities.reduce((sum, a) => sum + (a.progress || 0), 0) /
+            activities.length
+        )
+      : 0;
 
   if (loading) return <Spinner />;
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="px-6 text-white bg-emerald-900 py-14">
+      <header className="px-6 text-white bg-emerald-900 py-14">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4 mb-6">
             <img
               src={user?.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png"}
-              alt={user?.displayName}
+              alt={user?.displayName || "User avatar"}
               className="object-cover w-16 h-16 border-4 border-green-400 rounded-full"
             />
             <div>
@@ -97,27 +121,30 @@ const MyActivities = () => {
             </div>
           </div>
 
-          {/* Summary stats */}
-          <div className="grid grid-cols-3 gap-4 mt-6">
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {[
-              { icon: <FaLeaf />, value: activities.length, label: "Joined" },
+              { icon: <FaLeaf />, value: activities.length, label: "Total Joined" },
               { icon: <FaFire />, value: ongoingCount, label: "Ongoing" },
               { icon: <FaTrophy />, value: completedCount, label: "Completed" },
+              { icon: <FaChartLine />, value: `${totalProgress}%`, label: "Avg Progress" },
             ].map((s, i) => (
               <div key={i} className="p-4 text-center bg-white/10 rounded-xl">
-                <div className="flex justify-center mb-1 text-green-300">{s.icon}</div>
+                <div className="flex justify-center mb-1 text-lg text-green-300">
+                  {s.icon}
+                </div>
                 <div className="text-2xl font-black">{s.value}</div>
                 <div className="text-xs text-emerald-300">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-5xl px-6 py-10 mx-auto">
+      <main className="max-w-5xl px-6 py-10 mx-auto">
         {activities.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="mb-4 text-6xl">🌱</p>
+            <div className="mb-4 text-6xl" aria-hidden="true">🌱</div>
             <h2 className="mb-2 text-xl font-bold text-gray-700">
               No activities yet!
             </h2>
@@ -128,110 +155,151 @@ const MyActivities = () => {
               to="/challenges"
               className="px-6 py-3 font-semibold text-white transition bg-green-500 hover:bg-green-600 rounded-xl"
             >
-              
+              Browse Challenges
             </Link>
           </div>
         ) : (
           <div className="space-y-6">
             {activities.map((activity) => {
               const challenge = challenges[activity.challengeId];
+              const progressColor =
+                activity.progress >= 100
+                  ? "from-green-400 to-emerald-500"
+                  : activity.progress >= 50
+                  ? "from-blue-400 to-cyan-500"
+                  : "from-yellow-400 to-orange-400";
+
               return (
-                <div
+                <article
                   key={activity._id}
                   className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl"
+                  aria-label={`Challenge: ${challenge?.title}`}
                 >
                   <div className="flex flex-col md:flex-row">
-                    {/* Challenge image */}
+                    {/* Challenge Image */}
                     {challenge?.imageUrl && (
                       <img
                         src={challenge.imageUrl}
-                        alt={challenge?.title}
-                        className="flex-shrink-0 object-cover w-full h-40 md:w-48 md:h-auto"
+                        alt={challenge?.title || "Challenge image"}
+                        className="flex-shrink-0 object-cover w-full md:w-52 h-44 md:h-auto"
                       />
                     )}
 
                     <div className="flex-grow p-6">
+                      {/* Title + Status */}
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div>
                           <h3 className="text-lg font-bold text-gray-800">
                             {challenge?.title || "Challenge"}
                           </h3>
                           <p className="text-xs text-gray-400 mt-0.5">
-                            {challenge?.category} • Joined{" "}
-                            {new Date(activity.joinDate).toLocaleDateString()}
+                            {challenge?.category}
                           </p>
                         </div>
                         <span
-                          className={`text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 ${
-                            statusColors[activity.status]
-                          }`}
+                          className={`text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 flex-shrink-0 ${statusColors[activity.status]}`}
                         >
                           {statusIcons[activity.status]}
                           {activity.status}
                         </span>
                       </div>
 
-                      {/* Progress bar */}
-                      <div className="mb-4">
-                        <div className="flex justify-between mb-1 text-xs text-gray-500">
+                      {/* Join Date + Last Updated */}
+                      <div className="flex flex-wrap gap-4 mb-4 text-xs text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <FaCalendarAlt className="text-green-400" />
+                          Joined: {new Date(activity.joinDate).toLocaleDateString()}
+                        </span>
+                        {activity.updatedAt && (
                           <span className="flex items-center gap-1">
-                            <FaChartLine className="text-green-500" /> Progress
+                            <FaClock className="text-blue-400" />
+                            Last updated:{" "}
+                            {new Date(activity.updatedAt).toLocaleString()}
                           </span>
-                          <span className="font-semibold text-green-600">
+                        )}
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="mb-4">
+                        <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+                          <span className="flex items-center gap-1">
+                            <FaChartLine className="text-green-500" />
+                            Progress
+                          </span>
+                          <span className="text-sm font-bold text-green-600">
                             {activity.progress}%
                           </span>
                         </div>
-                        <div className="w-full h-3 bg-gray-100 rounded-full">
+                        {/* Visual Progress Bar */}
+                        <div className="w-full h-4 overflow-hidden bg-gray-100 rounded-full">
                           <div
-                            className="h-3 transition-all duration-500 rounded-full bg-gradient-to-r from-green-400 to-emerald-500"
+                            className={`bg-gradient-to-r ${progressColor} h-4 rounded-full transition-all duration-700 flex items-center justify-end pr-2`}
                             style={{ width: `${activity.progress}%` }}
-                          ></div>
+                            role="progressbar"
+                            aria-valuenow={activity.progress}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-label={`Progress: ${activity.progress}%`}
+                          >
+                            {activity.progress >= 20 && (
+                              <span className="text-xs font-bold text-white">
+                                {activity.progress}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Update controls */}
+                      {/* Controls */}
                       <div className="flex flex-wrap items-center gap-3">
-                        <input
-                          type="range"
-                          min={0}
-                          max={100}
-                          defaultValue={activity.progress}
-                          onChange={(e) => {
-                            setActivities((prev) =>
-                              prev.map((a) =>
-                                a._id === activity._id
-                                  ? { ...a, progress: parseInt(e.target.value) }
-                                  : a
-                              )
-                            );
-                          }}
-                          className="flex-grow h-2 accent-green-500"
-                        />
+                        {/* Range Slider */}
+                        <div className="flex-grow min-w-40">
+                          <label
+                            htmlFor={`progress-${activity._id}`}
+                            className="sr-only"
+                          >
+                            Update progress for {challenge?.title}
+                          </label>
+                          <input
+                            id={`progress-${activity._id}`}
+                            type="range"
+                            min={0}
+                            max={100}
+                            step={5}
+                            value={activity.progress}
+                            onChange={(e) =>
+                              handleProgressChange(activity._id, e.target.value)
+                            }
+                            className="w-full h-2 cursor-pointer accent-green-500"
+                            aria-label="Progress slider"
+                          />
+                          <div className="flex justify-between text-xs text-gray-300 mt-0.5">
+                            <span>0%</span>
+                            <span>50%</span>
+                            <span>100%</span>
+                          </div>
+                        </div>
 
+                        {/* Status Select */}
                         <select
-                          defaultValue={activity.status}
-                          onChange={(e) => {
-                            setActivities((prev) =>
-                              prev.map((a) =>
-                                a._id === activity._id
-                                  ? { ...a, status: e.target.value }
-                                  : a
-                              )
-                            );
-                          }}
+                          value={activity.status}
+                          onChange={(e) =>
+                            handleStatusChange(activity._id, e.target.value)
+                          }
                           className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                          aria-label="Update status"
                         >
                           <option>Not Started</option>
                           <option>Ongoing</option>
                           <option>Finished</option>
                         </select>
 
+                        {/* Save Button */}
                         <button
-                          onClick={() =>
-                            updateProgress(activity._id, activity.progress, activity.status)
-                          }
+                          onClick={() => updateProgress(activity._id)}
                           disabled={updating === activity._id}
-                          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition bg-green-500 hover:bg-green-600 rounded-xl disabled:opacity-60"
+                          className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white transition bg-green-500 hover:bg-green-600 rounded-xl disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-green-400"
+                          aria-label="Save progress"
                         >
                           {updating === activity._id ? (
                             <span className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"></span>
@@ -240,14 +308,24 @@ const MyActivities = () => {
                           )}
                         </button>
                       </div>
+
+                      {/* Challenge Link */}
+                      <div className="pt-4 mt-4 border-t border-gray-100">
+                        <Link
+                          to={`/challenges/${activity.challengeId}`}
+                          className="flex items-center gap-1 text-xs font-semibold text-green-600 hover:text-green-700"
+                        >
+                          <FaLeaf /> View Challenge Details
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };

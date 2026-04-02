@@ -10,6 +10,8 @@ import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
 import NotFound from "../pages/NotFound";
 import PrivateRoute from "./PrivateRoute";
+import Tips from "../pages/Tips";
+import Events from "../pages/Events";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,8 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      { path: "/tips", element: <Tips /> },
+      { path: "/events", element: <Events /> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       { path: "/forgot-password", element: <ForgotPassword /> },
