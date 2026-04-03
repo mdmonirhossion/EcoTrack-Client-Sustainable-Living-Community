@@ -4,14 +4,15 @@ import Home from "../pages/Home";
 import Challenges from "../pages/Challenges";
 import ChallengeDetail from "../pages/ChallengeDetail";
 import AddChallenge from "../pages/AddChallenge";
+import JoinChallenge from "../pages/JoinChallenge";
 import MyActivities from "../pages/MyActivities";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
 import NotFound from "../pages/NotFound";
-import PrivateRoute from "./PrivateRoute";
 import Tips from "../pages/Tips";
 import Events from "../pages/Events";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <AddChallenge />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/challenges/join/:id",
+        element: (
+          <PrivateRoute>
+            <JoinChallenge />
           </PrivateRoute>
         ),
       },
