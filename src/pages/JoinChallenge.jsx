@@ -7,6 +7,7 @@ import {
   FaBullseye, FaArrowLeft, FaCheckCircle,
 } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
+import { getAuth } from "firebase/auth";
 import Spinner from "../components/Spinner";
 
 const API = import.meta.env.VITE_API_URL;
@@ -51,13 +52,18 @@ const JoinChallenge = () => {
     }
     setJoining(true);
     try {
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+      
       await axios.post(`${API}/api/challenges/join/${id}`, {
         userId: user.email,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setJoined(true);
       toast.success("Successfully joined the challenge! 🎉");
     } catch (err) {
-      if (err.response?.data?.message === "Already joined") {
+      if (err.response?.data?.error === "Already joined" || err.response?.data?.message === "Already joined") {
         toast.error("You have already joined this challenge!");
         setJoined(true);
       } else {

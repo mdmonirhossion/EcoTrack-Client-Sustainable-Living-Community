@@ -81,7 +81,7 @@ const Footer = () => {
 
       {/* Bottom bar */}
       <div className="border-t border-gray-700 pt-4 text-center text-xs text-gray-500 space-y-1">
-        <p>2025 EcoTrack. All rights reserved.</p>
+        <p>© 2025 EcoTrack. All rights reserved.</p>
         <p>
           This site is committed to{" "}
           <span className="text-green-400">accessibility</span> and{" "}

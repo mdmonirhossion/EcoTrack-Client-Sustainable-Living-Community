@@ -7,6 +7,7 @@ import {
   FaTrophy, FaChartLine, FaCalendarAlt
 } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
+import { getAuth } from "firebase/auth";
 import Spinner from "../components/Spinner";
 
 const API = import.meta.env.VITE_API_URL;
@@ -31,10 +32,15 @@ const MyActivities = () => {
   const [updating, setUpdating] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
-    axios
-      .get(`${API}/api/my-activities/${user.email}`)
-      .then(async (res) => {
+    const fetchActivities = async () => {
+      if (!user) return;
+      try {
+        const auth = getAuth();
+        const token = await auth.currentUser.getIdToken();
+        
+        const res = await axios.get(`${API}/api/my-activities`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         setActivities(res.data);
         const challengeDetails = {};
         await Promise.all(
@@ -43,14 +49,16 @@ const MyActivities = () => {
               const r = await axios.get(`${API}/api/challenges/${act.challengeId}`);
               challengeDetails[act.challengeId] = r.data;
             } catch (error) {
-              // Silently ignore errors if challenge details fail to load
             }
           })
         );
         setChallenges(challengeDetails);
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      } catch (err) {
+        setLoading(false);
+      }
+    };
+    fetchActivities();
   }, [user]);
 
   const handleProgressChange = (activityId, value) => {
@@ -73,9 +81,14 @@ const MyActivities = () => {
     const activity = activities.find((a) => a._id === activityId);
     setUpdating(activityId);
     try {
-      await axios.patch(`${API}/api/my-activities/${activityId}/progress`, {
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+      
+      await axios.patch(`${API}/api/user-challenges/${activityId}`, {
         progress: activity.progress,
         status: activity.status,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setActivities((prev) =>
         prev.map((a) =>

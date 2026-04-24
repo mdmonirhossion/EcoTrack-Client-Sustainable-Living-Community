@@ -8,6 +8,7 @@ import {
   FaEdit, FaTrash,
 } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
+import { getAuth } from "firebase/auth";
 import Spinner from "../components/Spinner";
 
 const API = import.meta.env.VITE_API_URL;
@@ -62,7 +63,12 @@ const ChallengeDetail = () => {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      await axios.delete(`${API}/api/challenges/${id}`);
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+      
+      await axios.delete(`${API}/api/challenges/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success("Challenge deleted successfully!");
       setShowDeleteModal(false);
       navigate("/challenges");
@@ -77,9 +83,14 @@ const ChallengeDetail = () => {
     e.preventDefault();
     setEditLoading(true);
     try {
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+      
       await axios.patch(`${API}/api/challenges/${id}`, {
         ...editData,
         duration: Number(editData.duration),
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setChallenge((prev) => ({ ...prev, ...editData }));
       toast.success("Challenge updated successfully! 🌿");

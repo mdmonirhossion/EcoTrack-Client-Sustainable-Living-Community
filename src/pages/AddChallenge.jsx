@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { FaLeaf, FaPlus, FaMapMarkerAlt } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
+import { getAuth } from "firebase/auth";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -66,12 +67,17 @@ const AddChallenge = () => {
     setLoading(true);
 
     try {
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+
       await axios.post(`${API}/api/challenges`, {
         ...data,
         createdBy: user.email,
         participants: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Challenge created successfully! 🌿");
       navigate("/challenges");

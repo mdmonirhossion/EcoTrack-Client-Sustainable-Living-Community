@@ -1,37 +1,84 @@
 # EcoTrack - Sustainable Living Community
 
-Live Site URL: https://your-ecotrack-client-url.example.com
+A community platform where eco-conscious people discover and join sustainability challenges, share practical eco-tips, browse local green events, and track personal environmental impact.
+
+## Live Site URL
+
+https://ecotrack-sustainable-community.web.app
 
 ## Features
 
-- Discover active sustainability challenges with category, impact metric, and participation stats.
-- Join challenges and track personal progress from the protected My Activities dashboard.
-- Firebase authentication with Email/Password and Google sign-in.
-- Dynamic home sections for live stats, recent eco tips, and upcoming local green events.
-- Protected route redirection preserves the intended destination after login.
-- Styled toast notifications for all success/error feedback (no default browser alerts).
-- Responsive layout with public pages and protected dashboard routes.
+- **Discover Challenges**: Browse active sustainability challenges with categories, impact metrics, and participation stats
+- **Join & Track Progress**: Join challenges and track your personal progress from the protected My Activities dashboard
+- **Firebase Authentication**: Secure login with Email/Password and Google sign-in
+- **Dynamic Home Sections**: Live community statistics, recent eco tips, and upcoming local green events pulled from database
+- **Protected Routes**: Private dashboard routes redirect to login and preserve intended destination after authentication
+- **Styled Notifications**: Toast notifications for all success/error feedback (no default browser alerts)
+- **Responsive Design**: Mobile-friendly with hamburger navigation and adaptive layouts
+- **Advanced Filtering**: Filter challenges by category, participant count, and start/end dates using MongoDB operators
 
-## Tech Stack
+## Tech Stack (Client)
 
-- React + Vite
-- React Router
+- React 19 + Vite
+- React Router 7
 - Firebase Authentication
+- Tailwind CSS
 - Axios
 - React Hot Toast
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Tech Stack (Server)
 
-Currently, two official plugins are available:
+- Express.js
+- MongoDB + Mongoose
+- Firebase Admin SDK
+- Node.js
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Getting Started
 
-## React Compiler
+### Client Setup
+```bash
+cd Ecotrack\ Community-client
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Server Setup
+```bash
+cd Ecotrack-Community-server
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Client**: React SPA with protected/private routes
+- **Server**: Express REST API with MongoDB
+- **Authentication**: Firebase (client) + Firebase Admin (server)
+
+## Routes
+
+### Public Routes
+- `/` - Home
+- `/challenges` - Browse challenges
+- `/challenges/:id` - Challenge detail
+- `/login` - Login page
+- `/register` - Register page
+- `/tips` - Community tips
+- `/events` - Upcoming events
+
+### Protected Routes
+- `/challenges/add` - Create new challenge
+- `/challenges/join/:id` - Join a challenge
+- `/my-activities` - User progress dashboard
+
+## API Endpoints
+
+- `GET /api/challenges` - List challenges (supports filters)
+- `GET /api/challenges/:id` - Challenge detail
+- `POST /api/challenges` - Create challenge (protected)
+- `POST /api/challenges/join/:id` - Join challenge (protected)
+- `GET /api/user-challenges` - User's joined challenges (protected)
+- `PATCH /api/user-challenges/:id` - Update progress (protected)
+- `GET /api/tips` - Community tips
+- `GET /api/events` - Upcoming events
+- `GET /api/stats` - Community statistics
