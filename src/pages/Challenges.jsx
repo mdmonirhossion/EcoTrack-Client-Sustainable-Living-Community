@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
+import api from "../api/axios";
 import ChallengeCard from "../components/ChallengeCard";
 import SkeletonCard from "../components/SkeletonCard";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { FaFilter, FaSearch, FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
-
-const API = import.meta.env.VITE_API_URL;
 
 const categories = [
   "All",
@@ -28,23 +26,44 @@ const ChallengesContent = () => {
   const [endDate, setEndDate] = useState("");
   const [applying, setApplying] = useState(false);
 
-  // Initial fetch
-  useEffect(() => {
-    fetchChallenges();
+  const normalizeChallenges = useCallback((payload) => {
+    if (Array.isArray(payload)) return payload;
+
+    // Sometimes APIs return a stringified JSON array/object.
+    if (typeof payload === "string") {
+      try {
+        return normalizeChallenges(JSON.parse(payload));
+      } catch {
+        return [];
+      }
+    }
+
+    if (payload && typeof payload === "object") {
+      const candidate = payload.challenges ?? payload.data;
+      if (Array.isArray(candidate)) return candidate;
+    }
+
+    return [];
   }, []);
 
-  const fetchChallenges = async (params = {}) => {
+  const fetchChallenges = useCallback(async (params = {}) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/api/challenges`, { params });
-      setChallenges(res.data);
+      const res = await api.get('/api/challenges', { params });
+      const data = normalizeChallenges(res.data);
+      setChallenges(data);
     } catch (err) {
       toast.error("Failed to load challenges. Please try again!");
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [normalizeChallenges]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchChallenges();
+  }, [fetchChallenges]);
 
   const handleApplyFilters = async () => {
     setApplying(true);
@@ -56,15 +75,16 @@ const ChallengesContent = () => {
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
 
-      const res = await axios.get(`${API}/api/challenges`, { params });
-      setChallenges(res.data);
+      const res = await api.get('/api/challenges', { params });
+      const data = normalizeChallenges(res.data);
+      setChallenges(data);
 
-      if (res.data.length === 0) {
+      if (data.length === 0) {
         toast("No challenges match your filters 🌿", { icon: "🔍" });
       } else {
-        toast.success(`Found ${res.data.length} challenges!`);
+        toast.success(`Found ${data.length} challenges!`);
       }
-    } catch (err) {
+    } catch {
       toast.error("Filter failed. Please try again!");
     } finally {
       setApplying(false);
@@ -82,8 +102,9 @@ const ChallengesContent = () => {
     toast.success("Filters cleared!");
   };
 
-  const filtered = challenges.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase())
+  const safeChallenges = Array.isArray(challenges) ? challenges : [];
+  const filtered = safeChallenges.filter((c) =>
+    (c?.title || "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (

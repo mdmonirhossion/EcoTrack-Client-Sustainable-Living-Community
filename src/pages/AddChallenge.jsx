@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import toast from "react-hot-toast";
 import { FaLeaf, FaPlus, FaMapMarkerAlt } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
-import { getAuth } from "firebase/auth";
-
-const API = import.meta.env.VITE_API_URL;
 
 const categories = [
   "Waste Reduction",
@@ -67,21 +64,14 @@ const AddChallenge = () => {
     setLoading(true);
 
     try {
-      const auth = getAuth();
-      const token = await auth.currentUser.getIdToken();
-
-      await axios.post(`${API}/api/challenges`, {
+      await api.post('/api/challenges', {
         ...data,
-        createdBy: user.email,
+        createdBy: user.uid,
         participants: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Challenge created successfully! 🌿");
       navigate("/challenges");
-    } catch (err) {
+    } catch {
       toast.error("Failed to create challenge. Try again!");
     } finally {
       setLoading(false);

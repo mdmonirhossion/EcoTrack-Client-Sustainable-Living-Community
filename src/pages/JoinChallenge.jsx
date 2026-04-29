@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import toast from "react-hot-toast";
 import {
   FaLeaf, FaUsers, FaClock, FaCalendarAlt,
   FaBullseye, FaArrowLeft, FaCheckCircle,
 } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
-import { getAuth } from "firebase/auth";
 import Spinner from "../components/Spinner";
-
-const API = import.meta.env.VITE_API_URL;
 
 const categoryColors = {
   "Waste Reduction": "bg-yellow-100 text-yellow-700",
@@ -28,97 +25,64 @@ const JoinChallenge = () => {
   const [challenge, setChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
-  const [joined, setJoined] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(`${API}/api/challenges/${id}`)
+    setError(null);
+    api.get(`/api/challenges/${id}`)
       .then((res) => {
         setChallenge(res.data);
         setLoading(false);
       })
-      .catch(() => {
-        toast.error("Failed to load challenge!");
+      .catch((err) => {
+        console.error("API Error:", err.response?.status, err.response?.data);
+        const status = err.response?.status;
+        if (status === 404) {
+          setError("Challenge not found.");
+        } else if (!err.response) {
+          setError("Cannot connect to server. Is the backend running?");
+        } else {
+          setError("Failed to load challenge. Please try again later.");
+        }
         setLoading(false);
       });
   }, [id]);
 
   const handleJoin = async (e) => {
     e.preventDefault();
-    if (!agreed) {
-      toast.error("Please agree to the challenge terms!");
-      return;
-    }
+    if (!agreed) return toast.error("Please agree to terms!");
+    const userId = user?.uid || user?.email;
+    if (!userId) return toast.error("Please sign in again.");
+  
     setJoining(true);
     try {
-      const auth = getAuth();
-      const token = await auth.currentUser.getIdToken();
-      
-      await axios.post(`${API}/api/challenges/join/${id}`, {
-        userId: user.email,
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setJoined(true);
-      toast.success("Successfully joined the challenge! 🎉");
+      await api.post(`/api/challenges/${id}/join`, { userId });
+    
+      toast.success("Joined! Time to save the planet 🌿");
+      navigate("/my-activities");
     } catch (err) {
-      if (err.response?.data?.error === "Already joined" || err.response?.data?.message === "Already joined") {
-        toast.error("You have already joined this challenge!");
-        setJoined(true);
-      } else {
-        toast.error("Failed to join. Please try again!");
-      }
+      const msg = err.response?.data?.message || "Join failed";
+      toast.error(msg);
+      if(msg === "Already joined") navigate("/my-activities");
     } finally {
       setJoining(false);
     }
   };
-
   if (loading) return <Spinner />;
+  if (error) return (
+    <div className="flex flex-col items-center justify-center min-h-screen text-gray-500 gap-4">
+      <p>{error}</p>
+      <button onClick={() => window.location.reload()} className="text-sm text-green-600 hover:underline">
+        Retry
+      </button>
+    </div>
+  );
   if (!challenge) return (
     <div className="flex items-center justify-center min-h-screen text-gray-500">
       Challenge not found.
     </div>
   );
-
-  // ── SUCCESS STATE ──
-  if (joined) {
-    return (
-      <div className="flex items-center justify-center min-h-screen px-4 bg-gradient-to-br from-green-50 to-emerald-100">
-        <div className="w-full max-w-md p-10 text-center bg-white shadow-xl rounded-2xl">
-          <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-green-100 rounded-full">
-            <FaCheckCircle className="text-4xl text-green-500" />
-          </div>
-          <h2 className="mb-2 text-2xl font-black text-gray-800">
-            You are in! 🎉
-          </h2>
-          <p className="mb-2 text-sm text-gray-500">
-            You have successfully joined:
-          </p>
-          <p className="mb-6 text-lg font-bold text-green-600">
-            {challenge.title}
-          </p>
-          <p className="mb-8 text-xs text-gray-400">
-            Track your progress from the My Activities dashboard.
-          </p>
-          <div className="flex gap-3">
-            <Link
-              to="/my-activities"
-              className="flex-1 py-3 text-sm font-bold text-center text-white transition bg-green-500 hover:bg-green-600 rounded-xl"
-            >
-              View My Activities
-            </Link>
-            <Link
-              to="/challenges"
-              className="flex-1 py-3 text-sm font-semibold text-center text-gray-600 transition border border-gray-200 hover:bg-gray-50 rounded-xl"
-            >
-              Browse More
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen px-4 py-10 bg-gray-50">

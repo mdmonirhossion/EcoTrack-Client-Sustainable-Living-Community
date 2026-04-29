@@ -47,6 +47,14 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "/my-activities/:id",
+        element: (
+          <PrivateRoute>
+            <MyActivities />
+          </PrivateRoute>
+        ),
+      },
       { path: "/tips", element: <Tips /> },
       { path: "/events", element: <Events /> },
       { path: "/login", element: <Login /> },

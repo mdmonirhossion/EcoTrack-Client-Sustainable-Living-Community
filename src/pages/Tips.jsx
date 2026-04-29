@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { FaThumbsUp, FaUser, FaLeaf } from "react-icons/fa";
 import SkeletonCard from "../components/SkeletonCard";
-
-const API = import.meta.env.VITE_API_URL;
 
 const categoryColors = {
   "Waste Management": "bg-yellow-100 text-yellow-700",
@@ -18,8 +16,7 @@ const Tips = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`${API}/api/tips`)
+    api.get('/api/tips')
       .then((res) => {
         setTips(res.data);
         setLoading(false);
@@ -46,7 +43,7 @@ const Tips = () => {
             ? Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)
             : tips.map((tip, i) => (
                 <article
-                  key={i}
+                  key={tip._id || i}
                   className="flex flex-col h-full p-6 transition bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md"
                 >
                   <span

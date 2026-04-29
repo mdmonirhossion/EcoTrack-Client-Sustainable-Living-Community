@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaLeaf, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
@@ -7,17 +7,25 @@ import useAuth from "../hooks/useAuth";
 const Register = () => {
   const { register, googleLogin, updateUserProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [passError, setPassError] = useState("");
 
   const validatePassword = (pass) => {
-    if (pass.length < 6) return "Minimum 6 characters required.";
-    if (!/[A-Z]/.test(pass)) return "Must include at least 1 uppercase letter.";
-    if (!/[a-z]/.test(pass)) return "Must include at least 1 lowercase letter.";
-    if (!/[!@#$%^&*(),.?":|<>{}]/.test(pass))
-      return "Must include at least 1 special character.";
-    return "";
+  if (pass.length < 6) return "Min 6 characters";
+  if (!/[A-Z]/.test(pass)) return "Add an uppercase letter";
+  if (!/[!@#$%^&*]/.test(pass)) return "Add a special character";
+  return "";
+};
+
+  const getAuthError = (err) => {
+    const code = err?.code || "";
+    if (code.includes("email-already-in-use")) return "An account with this email already exists.";
+    if (code.includes("invalid-email")) return "Invalid email address.";
+    if (code.includes("weak-password")) return "Password is too weak.";
+    return "Registration failed. Please try again.";
   };
 
   const handleRegister = async (e) => {
@@ -36,9 +44,9 @@ const Register = () => {
       await register(email, password);
       await updateUserProfile(name, photoURL);
       toast.success("Welcome to EcoTrack! 🌿");
-      navigate("/");
+      navigate(from, { replace: true });
     } catch (err) {
-      toast.error(err.message || "Registration failed!");
+      toast.error(getAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -49,9 +57,9 @@ const Register = () => {
     try {
       await googleLogin();
       toast.success("Welcome to EcoTrack! 🌿");
-      navigate("/");
-    } catch (err) {
-      toast.error("Google signup failed!");
+      navigate(from, { replace: true });
+    } catch {
+      toast.error("Google signup failed. Please try again.");
     } finally {
       setLoading(false);
     }

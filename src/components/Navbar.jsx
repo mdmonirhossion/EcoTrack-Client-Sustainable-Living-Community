@@ -17,7 +17,7 @@ const Navbar = () => {
       navigate("/");
       setDropdownOpen(false);
       setMenuOpen(false);
-    } catch (error) {
+    } catch {
       toast.error("Logout failed. Please try again.");
     }
   };

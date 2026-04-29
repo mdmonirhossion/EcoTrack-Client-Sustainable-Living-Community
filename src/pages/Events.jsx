@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaLeaf } from "react-icons/fa";
 import SkeletonCard from "../components/SkeletonCard";
-
-const API = import.meta.env.VITE_API_URL;
 
 const Events = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`${API}/api/events`)
+    api.get('/api/events')
       .then((res) => {
         setEvents(res.data);
         setLoading(false);
@@ -43,8 +40,8 @@ const Events = () => {
                 );
                 return (
                   <article
-                    key={i}
-                    className="flex flex-col h-full overflow-hidden transition bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md"
+                  key={event._id || i}
+                  className="flex flex-col h-full overflow-hidden transition bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md"
                   >
                     {/* Date Badge */}
                     <div className="py-4 text-center text-white bg-green-500">

@@ -23,7 +23,7 @@ const Login = () => {
       await login(email, password);
       toast.success("Welcome back to EcoTrack! 🌿");
       navigate(from, { replace: true });
-    } catch (err) {
+    } catch {
       toast.error("Invalid email or password!");
     } finally {
       setLoading(false);
@@ -36,7 +36,7 @@ const Login = () => {
       await googleLogin();
       toast.success("Welcome to EcoTrack! 🌿");
       navigate(from, { replace: true });
-    } catch (err) {
+    } catch {
       toast.error("Google login failed. Try again!");
     } finally {
       setLoading(false);

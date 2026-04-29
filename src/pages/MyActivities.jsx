@@ -10,7 +10,7 @@ import useAuth from "../hooks/useAuth";
 import { getAuth } from "firebase/auth";
 import Spinner from "../components/Spinner";
 
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
 const statusColors = {
   "Not Started": "bg-gray-100 text-gray-600",
@@ -38,23 +38,25 @@ const MyActivities = () => {
         const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
         
-        const res = await axios.get(`${API}/api/my-activities`, {
+        const res = await axios.get(`${API}/api/my-activities?userId=${user.uid}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setActivities(res.data);
+        const activitiesData = Array.isArray(res.data) ? res.data : [];
+        setActivities(activitiesData);
         const challengeDetails = {};
         await Promise.all(
-          res.data.map(async (act) => {
+          activitiesData.map(async (act) => {
             try {
               const r = await axios.get(`${API}/api/challenges/${act.challengeId}`);
               challengeDetails[act.challengeId] = r.data;
             } catch (error) {
+              console.error(`Failed to fetch challenge ${act.challengeId}:`, error);
             }
           })
         );
         setChallenges(challengeDetails);
         setLoading(false);
-      } catch (err) {
+      } catch {
         setLoading(false);
       }
     };
@@ -84,7 +86,7 @@ const MyActivities = () => {
       const auth = getAuth();
       const token = await auth.currentUser.getIdToken();
       
-      await axios.patch(`${API}/api/user-challenges/${activityId}`, {
+      await axios.patch(`${API}/api/my-activities/${activityId}`, {
         progress: activity.progress,
         status: activity.status,
       }, {

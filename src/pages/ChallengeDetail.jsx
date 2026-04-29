@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import toast from "react-hot-toast";
 import {
   FaUsers, FaClock, FaCalendarAlt, FaLeaf,
   FaArrowLeft, FaBullseye, FaChartLine,
-  FaEdit, FaTrash,
+  FaEdit, FaTrash, FaCheckCircle,
 } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
-import { getAuth } from "firebase/auth";
 import Spinner from "../components/Spinner";
-
-const API = import.meta.env.VITE_API_URL;
 
 const categories = [
   "Waste Reduction",
@@ -41,10 +38,11 @@ const ChallengeDetail = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [editData, setEditData] = useState({});
+  const [hasJoined, setHasJoined] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`${API}/api/challenges/${id}`)
+    api
+      .get(`/api/challenges/${id}`)
       .then((res) => {
         setChallenge(res.data);
         setEditData({
@@ -60,15 +58,21 @@ const ChallengeDetail = () => {
       });
   }, [id]);
 
+  useEffect(() => {
+    const checkJoined = async () => {
+      if (!user || !challenge) return;
+      try {
+        const res = await api.get(`/api/my-activities/check/${id}?userId=${user.uid}`);
+        setHasJoined(res.data.joined);
+      } catch { /* ignore - user not joined */ }
+    };
+    checkJoined();
+  }, [user, challenge, id]);
+
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const auth = getAuth();
-      const token = await auth.currentUser.getIdToken();
-      
-      await axios.delete(`${API}/api/challenges/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/challenges/${id}`);
       toast.success("Challenge deleted successfully!");
       setShowDeleteModal(false);
       navigate("/challenges");
@@ -83,14 +87,11 @@ const ChallengeDetail = () => {
     e.preventDefault();
     setEditLoading(true);
     try {
-      const auth = getAuth();
-      const token = await auth.currentUser.getIdToken();
+      const { _id, ...updatePayload } = editData;
       
-      await axios.patch(`${API}/api/challenges/${id}`, {
-        ...editData,
+      await api.patch(`/api/challenges/${id}`, {
+        ...updatePayload,
         duration: Number(editData.duration),
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       setChallenge((prev) => ({ ...prev, ...editData }));
       toast.success("Challenge updated successfully! 🌿");
@@ -219,13 +220,29 @@ const ChallengeDetail = () => {
             ))}
           </div>
 
-          {/* ✅ JOIN BUTTON — /challenges/join/:id এ নিয়ে যাবে */}
-          <Link
-            to={`/challenges/join/${id}`}
-            className="flex items-center justify-center w-full gap-2 py-4 text-sm font-bold text-white transition bg-green-500 hover:bg-green-600 rounded-2xl"
-          >
-            <FaLeaf /> Join This Challenge
-          </Link>
+          {/* JOIN BUTTON */}
+          {user && hasJoined ? (
+            <Link
+              to="/my-activities"
+              className="flex items-center justify-center w-full gap-2 py-4 text-sm font-bold text-white transition bg-green-600 rounded-2xl"
+            >
+              <FaCheckCircle /> View My Activities
+            </Link>
+          ) : user ? (
+            <Link
+              to={`/challenges/join/${id}`}
+              className="flex items-center justify-center w-full gap-2 py-4 text-sm font-bold text-white transition bg-green-500 hover:bg-green-600 rounded-2xl"
+            >
+              <FaLeaf /> Join This Challenge
+            </Link>
+          ) : (
+            <Link
+              to={`/login?redirect=/challenges/join/${id}`}
+              className="flex items-center justify-center w-full gap-2 py-4 text-sm font-bold text-white transition bg-gray-400 hover:bg-gray-500 rounded-2xl"
+            >
+              <FaLeaf /> Login to Join
+            </Link>
+          )}
 
           {user && (
             <Link

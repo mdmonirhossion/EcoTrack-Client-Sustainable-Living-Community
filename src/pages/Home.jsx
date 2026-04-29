@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import {
   FaLeaf, FaRecycle, FaBolt, FaWater, FaBus,
   FaArrowRight, FaUsers, FaFire, FaSeedling
@@ -9,8 +9,6 @@ import SkeletonCard from "../components/SkeletonCard";
 import ChallengeCard from "../components/ChallengeCard";
 import TipCard from "../components/TipCard";
 import EventCard from "../components/EventCard";
-
-const API = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const [challenges, setChallenges] = useState([]);
@@ -22,27 +20,83 @@ const Home = () => {
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
 
+  const normalizeChallenges = useCallback((payload) => {
+    const walk = (value) => {
+      if (Array.isArray(value)) return value;
+
+      // Sometimes APIs return a stringified JSON array/object.
+      if (typeof value === "string") {
+        try {
+          return walk(JSON.parse(value));
+        } catch {
+          return [];
+        }
+      }
+
+      if (value && typeof value === "object") {
+        const candidate = value.challenges ?? value.data;
+        if (Array.isArray(candidate)) return candidate;
+      }
+
+      return [];
+    };
+
+    return walk(payload);
+  }, []);
+
+  const normalizeArray = useCallback((payload) => {
+    const walk = (value) => {
+      if (Array.isArray(value)) return value;
+
+      // Sometimes APIs return a stringified JSON array/object.
+      if (typeof value === "string") {
+        try {
+          return walk(JSON.parse(value));
+        } catch {
+          return [];
+        }
+      }
+
+      if (value && typeof value === "object") {
+        // Try common shapes returned from APIs.
+        const candidate = value.tips ?? value.events ?? value.data ?? value.challenges;
+        if (Array.isArray(candidate)) return candidate;
+      }
+
+      return [];
+    };
+
+    return walk(payload);
+  }, []);
+
   useEffect(() => {
     // Fetch challenges
-    axios.get(`${API}/api/challenges`).then((res) => {
-      setChallenges(res.data.slice(0, 6));
-      const totalParticipants = res.data.reduce((a, c) => a + (c.participants || 0), 0);
-      setStats({ totalChallenges: res.data.length, totalParticipants });
+    api.get('/api/challenges').then((res) => {
+      const data = normalizeChallenges(res.data);
+
+      const topSix = data.slice(0, 6);
+      setChallenges(topSix);
+
+      const totalParticipants = data.reduce(
+        (a, c) => a + (c?.participants || 0),
+        0
+      );
+      setStats({ totalChallenges: data.length, totalParticipants });
       setLoadingChallenges(false);
-    });
+    }).catch(() => setLoadingChallenges(false));
 
     // Fetch tips
-    axios.get(`${API}/api/tips`).then((res) => {
-      setTips(res.data);
+    api.get('/api/tips').then((res) => {
+      setTips(normalizeArray(res.data));
       setLoadingTips(false);
-    });
+    }).catch(() => setLoadingTips(false));
 
     // Fetch events
-    axios.get(`${API}/api/events`).then((res) => {
-      setEvents(res.data);
+    api.get('/api/events').then((res) => {
+      setEvents(normalizeArray(res.data));
       setLoadingEvents(false);
-    });
-  }, []);
+    }).catch(() => setLoadingEvents(false));
+  }, [normalizeChallenges, normalizeArray]);
 
   // Hero carousel auto-slide
   useEffect(() => {
@@ -281,7 +335,7 @@ const Home = () => {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {loadingTips
               ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />)
-              : tips.slice(0, 5).map((tip, i) => <TipCard key={i} tip={tip} />)}
+              : (Array.isArray(tips) ? tips.slice(0, 5).map((tip, i) => <TipCard key={i} tip={tip} />) : [])}
           </div>
         </div>
       </section>
