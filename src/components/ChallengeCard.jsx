@@ -13,12 +13,12 @@ const ChallengeCard = ({ challenge }) => {
   const { _id, title, category, description, duration, participants, imageUrl } = challenge;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden transition bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md">
       <div className="relative">
         <img
           src={imageUrl || "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400"}
           alt={title}
-          className="w-full h-44 object-cover"
+          className="object-cover w-full h-44"
         />
         <span
           className={`absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full ${
@@ -29,11 +29,11 @@ const ChallengeCard = ({ challenge }) => {
         </span>
       </div>
 
-      <div className="p-5 flex flex-col flex-grow">
-        <h3 className="font-bold text-gray-800 text-lg mb-2 line-clamp-1">{title}</h3>
-        <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-grow">{description}</p>
+      <div className="flex flex-col flex-grow p-5">
+        <h3 className="mb-2 text-lg font-bold text-gray-800 line-clamp-1">{title}</h3>
+        <p className="flex-grow mb-4 text-sm text-gray-500 line-clamp-2">{description}</p>
 
-        <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
+        <div className="flex items-center justify-between mb-4 text-xs text-gray-400">
           <span className="flex items-center gap-1">
             <FaClock className="text-green-500" /> {duration} days
           </span>
@@ -52,5 +52,7 @@ const ChallengeCard = ({ challenge }) => {
     </div>
   );
 };
+// submit the code for the ChallengeCard component, which displays a card with challenge information and a link to view more details. The card includes an image, category badge, title, description, duration, and participant count.
+
 
 export default ChallengeCard;

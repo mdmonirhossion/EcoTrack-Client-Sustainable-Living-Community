@@ -4,7 +4,7 @@ A community platform where eco-conscious people discover and join sustainability
 
 ## Live Site URL
 
-https://ecotrack-sustainable-community.web.app
+https://eco-track-client-sustainable-living.vercel.app/
 
 ## Features
 
