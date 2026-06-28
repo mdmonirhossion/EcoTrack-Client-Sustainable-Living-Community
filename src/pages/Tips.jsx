@@ -18,11 +18,15 @@ const Tips = () => {
   useEffect(() => {
     api.get('/api/tips')
       .then((res) => {
-        setTips(res.data);
+        const rawData = res.data;
+        // এপিআই ডেটা যদি অ্যারে না হয়ে অবজেক্ট হয় তবে সেভ জোনে রাখা
+        const normalized = Array.isArray(rawData) ? rawData : (rawData?.tips || rawData?.data || []);
+        setTips(normalized);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,38 +46,37 @@ const Tips = () => {
           {loading
             ? Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)
             : tips.map((tip, i) => (
-                <article
-                  key={tip._id || i}
-                  className="flex flex-col h-full p-6 transition bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md"
-                >
-                  <span
-                    className={`text-xs font-semibold px-2 py-1 rounded-full self-start mb-3 ${
-                      categoryColors[tip.category] || "bg-gray-100 text-gray-700"
+              <article
+                key={tip._id || i}
+                className="flex flex-col h-full p-6 transition bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md"
+              >
+                <span
+                  className={`text-xs font-semibold px-2 py-1 rounded-full self-start mb-3 ${categoryColors[tip.category] || "bg-gray-100 text-gray-700"
                     }`}
-                  >
-                    {tip.category}
+                >
+                  {tip.category}
+                </span>
+                <h2 className="mb-2 text-base font-bold text-gray-800 line-clamp-2">
+                  {tip.title}
+                </h2>
+                <p className="flex-grow mb-4 text-sm text-gray-500 line-clamp-4">
+                  {tip.content}
+                </p>
+                <div className="flex items-center justify-between pt-3 mt-auto text-xs text-gray-400 border-t border-gray-100">
+                  <span className="flex items-center gap-1">
+                    <FaUser className="text-green-400" />
+                    {tip.authorName}
                   </span>
-                  <h2 className="mb-2 text-base font-bold text-gray-800 line-clamp-2">
-                    {tip.title}
-                  </h2>
-                  <p className="flex-grow mb-4 text-sm text-gray-500 line-clamp-4">
-                    {tip.content}
-                  </p>
-                  <div className="flex items-center justify-between pt-3 mt-auto text-xs text-gray-400 border-t border-gray-100">
-                    <span className="flex items-center gap-1">
-                      <FaUser className="text-green-400" />
-                      {tip.authorName}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FaThumbsUp className="text-green-400" />
-                      {tip.upvotes}
-                    </span>
-                    <span>
-                      {new Date(tip.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </article>
-              ))}
+                  <span className="flex items-center gap-1">
+                    <FaThumbsUp className="text-green-400" />
+                    {tip.upvotes}
+                  </span>
+                  <span>
+                    {new Date(tip.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </article>
+            ))}
         </div>
       </div>
     </div>

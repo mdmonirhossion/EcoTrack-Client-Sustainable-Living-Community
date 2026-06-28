@@ -88,7 +88,7 @@ const ChallengeDetail = () => {
     setEditLoading(true);
     try {
       const { _id, ...updatePayload } = editData;
-      
+
       await api.patch(`/api/challenges/${id}`, {
         ...updatePayload,
         duration: Number(editData.duration),
@@ -130,8 +130,8 @@ const ChallengeDetail = () => {
           <FaArrowLeft /> Back
         </button>
 
-        {/* Edit + Delete — login থাকলে সবাই */}
-        {user && (
+        {/* Edit + Delete — শুধুমাত্র চ্যালেঞ্জ ক্রিয়েটরের জন্য */}
+        {user && user.uid === challenge.createdBy && (
           <div className="absolute z-10 flex gap-2 top-6 right-6">
             <button
               onClick={() => {

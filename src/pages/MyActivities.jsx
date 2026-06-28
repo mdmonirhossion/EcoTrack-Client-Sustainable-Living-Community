@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import toast from "react-hot-toast";
 import {
   FaLeaf, FaFire, FaCheckCircle, FaClock,
@@ -10,7 +10,6 @@ import useAuth from "../hooks/useAuth";
 import { getAuth } from "firebase/auth";
 import Spinner from "../components/Spinner";
 
-const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
 const statusColors = {
   "Not Started": "bg-gray-100 text-gray-600",
@@ -37,8 +36,8 @@ const MyActivities = () => {
       try {
         const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
-        
-        const res = await axios.get(`${API}/api/my-activities?userId=${user.uid}`, {
+
+        const res = await api.get(`/api/my-activities?userId=${user.uid}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const activitiesData = Array.isArray(res.data) ? res.data : [];
@@ -47,7 +46,7 @@ const MyActivities = () => {
         await Promise.all(
           activitiesData.map(async (act) => {
             try {
-              const r = await axios.get(`${API}/api/challenges/${act.challengeId}`);
+              const r = await api.get(`/api/challenges/${act.challengeId}`);
               challengeDetails[act.challengeId] = r.data;
             } catch (error) {
               console.error(`Failed to fetch challenge ${act.challengeId}:`, error);
@@ -85,13 +84,12 @@ const MyActivities = () => {
     try {
       const auth = getAuth();
       const token = await auth.currentUser.getIdToken();
-      
-      await axios.patch(`${API}/api/my-activities/${activityId}`, {
+
+      await api.patch(`/api/my-activities/${activityId}`, {
         progress: activity.progress,
         status: activity.status,
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
+
       setActivities((prev) =>
         prev.map((a) =>
           a._id === activityId
@@ -112,9 +110,9 @@ const MyActivities = () => {
   const totalProgress =
     activities.length > 0
       ? Math.round(
-          activities.reduce((sum, a) => sum + (a.progress || 0), 0) /
-            activities.length
-        )
+        activities.reduce((sum, a) => sum + (a.progress || 0), 0) /
+        activities.length
+      )
       : 0;
 
   if (loading) return <Spinner />;
@@ -181,8 +179,8 @@ const MyActivities = () => {
                 activity.progress >= 100
                   ? "from-green-400 to-emerald-500"
                   : activity.progress >= 50
-                  ? "from-blue-400 to-cyan-500"
-                  : "from-yellow-400 to-orange-400";
+                    ? "from-blue-400 to-cyan-500"
+                    : "from-yellow-400 to-orange-400";
 
               return (
                 <article

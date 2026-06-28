@@ -28,8 +28,14 @@ const AuthProvider = ({ children }) => {
 
   const logout = () => signOut(auth);
 
-  const updateUserProfile = (name, photo) =>
-    updateProfile(auth.currentUser, { displayName: name, photoURL: photo });
+  const updateUserProfile = (name, photo) => {
+    return updateProfile(auth.currentUser, { displayName: name, photoURL: photo })
+      .then(() => {
+
+        setUser({ ...auth.currentUser });
+      });
+  };
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
