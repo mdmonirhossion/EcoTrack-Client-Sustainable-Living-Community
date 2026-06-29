@@ -11,7 +11,7 @@ const NotFound = () => {
         {/* Animated leaf */}
         <div className="flex justify-center mb-6">
           <div className="flex items-center justify-center w-24 h-24 bg-green-100 rounded-full">
-            <FaLeaf className="text-5xl text-green-400 animate-bounce" />
+            <img src="/ecotrack.png" alt="EcoTrack Logo" className="w-16 h-16 object-contain animate-bounce" />
           </div>
         </div>
 

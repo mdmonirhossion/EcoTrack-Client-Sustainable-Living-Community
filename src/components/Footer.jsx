@@ -10,7 +10,7 @@ const Footer = () => {
         {/* Brand */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <FaLeaf className="text-green-400 text-xl" />
+            <img src="/ecotrack.png" alt="EcoTrack Logo" className="w-6 h-6 object-contain" />
             <span className="text-white font-bold text-lg">
               Eco<span className="text-green-400">Track</span>
             </span>

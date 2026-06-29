@@ -72,6 +72,17 @@ const Navbar = () => {
           My Activities
         </NavLink>
       )}
+      {user && (
+        <NavLink
+          to="/challenges/add"
+          className={({ isActive }) =>
+            isActive ? "text-green-400 font-semibold" : "hover:text-green-400 transition"
+          }
+          onClick={() => setMenuOpen(false)}
+        >
+          Add Challenge
+        </NavLink>
+      )}
     </>
   );
 
@@ -80,7 +91,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between px-4 py-3 mx-auto max-w-7xl">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <FaLeaf className="text-2xl text-green-400" />
+          <img src="/ecotrack.png" alt="EcoTrack Logo" className="w-8 h-8 object-contain" />
           <span className="text-xl font-bold text-white">
             Eco<span className="text-green-400">Track</span>
           </span>

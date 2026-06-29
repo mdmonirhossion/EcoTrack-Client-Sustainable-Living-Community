@@ -38,7 +38,7 @@ const ForgotPassword = () => {
         {/* Icon */}
         <div className="flex justify-center mb-4">
           <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full">
-            <FaLeaf className="text-3xl text-green-500" />
+            <img src="/ecotrack.png" alt="EcoTrack Logo" className="w-10 h-10 object-contain" />
           </div>
         </div>
 

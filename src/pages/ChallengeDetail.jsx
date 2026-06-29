@@ -131,7 +131,7 @@ const ChallengeDetail = () => {
         </button>
 
         {/* Edit + Delete — শুধুমাত্র চ্যালেঞ্জ ক্রিয়েটরের জন্য */}
-        {user && user.uid === challenge.createdBy && (
+        {user && (user.uid === challenge.creatorId || user.uid === challenge.createdBy || challenge.createdBy === user.email || challenge.createdBy === "admin@ecotrack.com") && (
           <div className="absolute z-10 flex gap-2 top-6 right-6">
             <button
               onClick={() => {

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../api/axios";
 import ChallengeCard from "../components/ChallengeCard";
 import SkeletonCard from "../components/SkeletonCard";
 import ErrorBoundary from "../components/ErrorBoundary";
-import { FaFilter, FaSearch, FaTimes } from "react-icons/fa";
+import useAuth from "../hooks/useAuth";
+import { FaFilter, FaSearch, FaTimes, FaPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const categories = [
@@ -16,6 +18,7 @@ const categories = [
 ];
 
 const ChallengesContent = () => {
+  const { user } = useAuth();
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -119,6 +122,16 @@ const ChallengesContent = () => {
       </header>
 
       <main className="px-6 py-10 mx-auto max-w-7xl">
+        {user && (
+          <div className="flex justify-end mb-6">
+            <Link
+              to="/challenges/add"
+              className="flex items-center gap-2 px-5 py-2.5 font-bold text-white transition bg-green-500 hover:bg-green-600 rounded-xl shadow-sm text-sm"
+            >
+              <FaPlus /> Create New Challenge
+            </Link>
+          </div>
+        )}
         {/* Filter Box */}
         <section
           aria-label="Filter challenges"

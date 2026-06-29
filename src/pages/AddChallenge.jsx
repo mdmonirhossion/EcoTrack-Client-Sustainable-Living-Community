@@ -66,7 +66,8 @@ const AddChallenge = () => {
     try {
       await api.post('/api/challenges', {
         ...data,
-        createdBy: user.uid,
+        createdBy: user.email || user.uid,
+        creatorId: user.uid,
         participants: 0,
       });
       toast.success("Challenge created successfully! 🌿");

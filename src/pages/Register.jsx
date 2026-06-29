@@ -70,7 +70,7 @@ const Register = () => {
       <div className="w-full max-w-md p-8 bg-white shadow-xl rounded-2xl">
         <div className="mb-8 text-center">
           <div className="flex justify-center mb-2">
-            <FaLeaf className="text-4xl text-green-500" />
+            <img src="/ecotrack.png" alt="EcoTrack Logo" className="w-12 h-12 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800">Join EcoTrack</h1>
           <p className="mt-1 text-sm text-gray-500">

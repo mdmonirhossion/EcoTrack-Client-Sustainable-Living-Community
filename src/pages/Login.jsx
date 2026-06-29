@@ -49,7 +49,7 @@ const Login = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-2">
-            <FaLeaf className="text-green-500 text-4xl" />
+            <img src="/ecotrack.png" alt="EcoTrack Logo" className="w-12 h-12 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800">Login to EcoTrack</h1>
           <p className="text-gray-500 text-sm mt-1">
